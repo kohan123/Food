@@ -237,31 +237,30 @@ window.addEventListener('DOMContentLoaded', () => {
       `
       form.insertAdjacentElement('afterend', statusMessege);
 
-      const request = new XMLHttpRequest();
-      const url = 'https://jsonplaceholder.typicode.com/posts';
-      request.open('GET', url);
-
-      request.setRequestHeader('Content-type', 'application/json');
       const formData = new FormData(form);
 
-      const obj = {};
-      formData.forEach(function(value, key) {
-        obj[key] = value;
-      });
+       const obj = {};
+       formData.forEach(function(value, key) {
+         obj[key] = value;
+       });
 
-      const json = JSON.stringify(obj);
 
-      request.send(json);
-
-      request.addEventListener('load', () => {
-        if (request.status === 200) {
-          console.log(request.response);
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+      }).then(data => data.json())
+      .then(data => {
+          console.log(data);
           showThanksModal(messege.success);
           form.reset();
           statusMessege.remove();
-        } else {
-          showThanksModal(messege.failure);
-        }
+      }).catch(() => {
+        showThanksModal(messege.failure);
+      }).finally(() => {
+        form.reset();
       })
     })
   }
