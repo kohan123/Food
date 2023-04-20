@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
           });
 
-          const deadline = '2022-04-11';
+          const deadline = '2023-04-25';
 
           function getTimeRemaining(endtime) {
             let days, hours, minutes, seconds;
@@ -112,7 +112,8 @@ window.addEventListener('DOMContentLoaded', () => {
           btn.addEventListener('click', openModal);
         });
     
-    modal.addEventListener('click', closeModal); 
+    modalCloseBtn.addEventListener('click', closeModal);
+
   
   function closeModal () {
     modal.classList.add('hide');
@@ -120,13 +121,19 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = '';
   };
 
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.getAttribute('data-close' == false)) {
+      closeModal();
+    };
+  })
+
   document.addEventListener('keydown', (e) => {
     if(e.code === 'Escape' && modal.classList.contains('show')) {
       closeModal();
     }
   })
 
-  const modalTimerId = setTimeout(openModal, 5000);
+  const modalTimerId = setTimeout(openModal, 50000);
 
   function showModalByScroll () {
     if (window.pageYOffset + document.documentElement.clientHeight >= 
@@ -206,4 +213,81 @@ window.addEventListener('DOMContentLoaded', () => {
     21,
     ".menu .container"
   ).render();
+
+  // Forms
+
+  const forms = document.querySelectorAll('form');
+
+  const messege = {
+    loading: 'img/form/spinner.svg',
+    success: 'Спасибо,мы скоро с вами свяжемся',
+    failure: 'Что-то пошло не так...'
+  }
+  forms.forEach(item => postData(item));
+
+  function postData (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const statusMessege = document.createElement('img');
+      statusMessege.src = messege.loading;
+      statusMessege.style.cssText = `
+        display: block;
+        margin: 0 auto;
+      `
+      form.insertAdjacentElement('afterend', statusMessege);
+
+      const request = new XMLHttpRequest();
+      const url = 'https://jsonplaceholder.typicode.com/posts';
+      request.open('GET', url);
+
+      request.setRequestHeader('Content-type', 'application/json');
+      const formData = new FormData(form);
+
+      const obj = {};
+      formData.forEach(function(value, key) {
+        obj[key] = value;
+      });
+
+      const json = JSON.stringify(obj);
+
+      request.send(json);
+
+      request.addEventListener('load', () => {
+        if (request.status === 200) {
+          console.log(request.response);
+          showThanksModal(messege.success);
+          form.reset();
+          statusMessege.remove();
+        } else {
+          showThanksModal(messege.failure);
+        }
+      })
+    })
+  }
+  function showThanksModal (messege) {
+    const prevModalDialog = document.querySelector('.modal__dialog');
+
+    prevModalDialog.classList.add('hide');
+    openModal();
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog');
+    thanksModal.innerHTML = `
+              <div class="modal__content">
+                  <div class="modal__close" data-close>×</div>
+                  <div class="modal__title">${messege}</div>
+              </div>
+              `;
+    document.querySelector('.modal').append(thanksModal);
+
+    setTimeout(() => {
+      thanksModal.remove();
+      prevModalDialog.classList.add('show');
+      prevModalDialog.classList.remove('hide');
+      closeModal();
+    }, 4000)
+  }
 });
+
+
