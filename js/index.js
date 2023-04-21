@@ -235,11 +235,11 @@ window.addEventListener('DOMContentLoaded', () => {
         display: block;
         margin: 0 auto;
       `
-      form.insertAdjacentElement('afterend', statusMessege);
+      form.insertAdjacentElement('afterend', statusMessege); // помещаем картинку загрузки после формы
 
       const formData = new FormData(form);
 
-       const obj = {};
+       const obj = {};                                    //преобразуем данные формы в объект
        formData.forEach(function(value, key) {
          obj[key] = value;
        });
@@ -287,6 +287,12 @@ window.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }, 4000)
   }
+
+
+  fetch('http://localhost:3000/menu')
+  .then(data => data.json())
+  .then(res => console.log(res));
+
 });
 
 
