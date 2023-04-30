@@ -122,7 +122,7 @@ window.addEventListener('DOMContentLoaded', () => {
   };
 
   modal.addEventListener('click', (e) => {
-    if (e.target === modal || e.target.getAttribute('data-close' == false)) {
+    if (e.target === modal) {
       closeModal();
     };
   })
@@ -261,18 +261,29 @@ const getResource = async(url) => {
     thanksModal.classList.add('modal__dialog');
     thanksModal.innerHTML = `
               <div class="modal__content">
-                  <div class="modal__close" data-close>×</div>
+                  <div class="modal__close" id="close" data-close>×</div>
                   <div class="modal__title">${messege}</div>
               </div>
               `;
     document.querySelector('.modal').append(thanksModal);
 
-    setTimeout(() => {
-      thanksModal.remove();
-      prevModalDialog.classList.add('show');
-      prevModalDialog.classList.remove('hide');
-      closeModal();
-    }, 4000)
+   const close = document.querySelector('#close');
+   let isClosed = null;
+   
+   close.addEventListener('click', () => {
+    removeThanksModal();
+    clearTimeout(isClosed);
+   });
+
+   isClosed = setTimeout(removeThanksModal,3000);
+  
+   function removeThanksModal () {
+    thanksModal.remove();
+    prevModalDialog.classList.add('show');
+    prevModalDialog.classList.remove('hide');
+    closeModal();
+   }
+
   }
 
 
